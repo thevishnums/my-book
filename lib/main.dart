@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(MyBooksApp());
@@ -92,7 +94,7 @@ class LoginScreen extends StatelessWidget {
 }
 
 //////////////////////////////////////////////////////////
-// 📚 BOOK LIST SCREEN
+// 📚 BOOK LIST SCREEN (FIXED STORAGE)
 //////////////////////////////////////////////////////////
 
 class BookListScreen extends StatefulWidget {
@@ -103,20 +105,55 @@ class BookListScreen extends StatefulWidget {
 class _BookListScreenState extends State<BookListScreen> {
   List<Map<String, String>> books = [];
 
+  // ✅ SAVE BOOKS
+  Future<void> saveBooks() async {
+    final prefs = await SharedPreferences.getInstance();
+    String encodedData = jsonEncode(books);
+    await prefs.setString('books', encodedData);
+  }
+
+  // ✅ LOAD BOOKS (FIXED)
+  Future<void> loadBooks() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? data = prefs.getString('books');
+
+    if (data != null) {
+      setState(() {
+        books = (jsonDecode(data) as List)
+            .map((e) => Map<String, String>.from(e))
+            .toList();
+      });
+    }
+  }
+
+  // ✅ LOAD ON START
+  @override
+  void initState() {
+    super.initState();
+    loadBooks();
+  }
+
+  // ✅ ADD BOOK
   void addBook(String title, String author) {
     if (title.isEmpty || author.isEmpty) return;
 
     setState(() {
       books.add({"title": title, "author": author});
     });
+
+    saveBooks();
   }
 
+  // ✅ EDIT BOOK
   void editBook(int index, String title, String author) {
     setState(() {
       books[index] = {"title": title, "author": author};
     });
+
+    saveBooks();
   }
 
+  // ✅ DIALOG
   void showBookDialog({int? index}) {
     String title = index != null ? books[index]['title']! : '';
     String author = index != null ? books[index]['author']! : '';
@@ -157,6 +194,7 @@ class _BookListScreenState extends State<BookListScreen> {
     );
   }
 
+  // ✅ UI
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -174,55 +212,47 @@ class _BookListScreenState extends State<BookListScreen> {
           )
         ],
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.white, Colors.purple.shade50],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: books.isEmpty
-            ? Center(
-                child: Text(
-                  "No books added 📚",
-                  style: TextStyle(fontSize: 18),
-                ),
-              )
-            : ListView.builder(
-                itemCount: books.length,
-                itemBuilder: (context, index) {
-                  return Card(
-                    margin: EdgeInsets.all(10),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: ListTile(
-                      leading: Icon(Icons.book, color: Colors.deepPurple),
-                      title: Text(books[index]['title']!),
-                      subtitle: Text(books[index]['author']!),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.edit, color: Colors.blue),
-                            onPressed: () => showBookDialog(index: index),
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.delete, color: Colors.red),
-                            onPressed: () {
-                              setState(() {
-                                books.removeAt(index);
-                              });
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
+      body: books.isEmpty
+          ? Center(
+              child: Text(
+                "No books added 📚",
+                style: TextStyle(fontSize: 18),
               ),
-      ),
+            )
+          : ListView.builder(
+              itemCount: books.length,
+              itemBuilder: (context, index) {
+                return Card(
+                  margin: EdgeInsets.all(10),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: ListTile(
+                    leading: Icon(Icons.book, color: Colors.deepPurple),
+                    title: Text(books[index]['title']!),
+                    subtitle: Text(books[index]['author']!),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: Icon(Icons.edit, color: Colors.blue),
+                          onPressed: () => showBookDialog(index: index),
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.delete, color: Colors.red),
+                          onPressed: () {
+                            setState(() {
+                              books.removeAt(index);
+                            });
+                            saveBooks();
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => showBookDialog(),
         child: Icon(Icons.add),
