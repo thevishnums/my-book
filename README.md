@@ -13,6 +13,7 @@ This project is a starting point for a Flutter application.
 *A screenshot of the app's user interface showing a list view of a single book with 'kannada' as the title and 'kuvempu' as the author.*
 ![image alt](https://github.com/thevishnums/my-book/blob/01303e5624ce11143e306e3fa5f07025b20d0cd7/pg4.jpeg)
 *A screenshot of a mobile app interface showing a list of books. It includes a search bar at the top, two book entries ('Computer Science' by xyz and 'Kannada' by Kuvempu with heart and delete icons), a bottom navigation bar with 'All Books' and 'Favorites' tabs, and a large plus icon for adding new books.*
+![image alt](https://github.com/thevishnums/my-book/blob/79bc9e8e5064efa982fdcb18c97161bd0b263cae/pg5.jpeg)
 
 - [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
 - [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
