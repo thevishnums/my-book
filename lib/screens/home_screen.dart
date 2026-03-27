@@ -217,8 +217,8 @@ class _HomeScreenState extends State<HomeScreen> {
       child: url.isNotEmpty
           ? Image.network(
               url,
-              width: 50,
-              height: 70,
+              width: 60,
+              height: 80,
               fit: BoxFit.cover,
               errorBuilder: (context, error, stackTrace) => _placeholderImage(),
             )
@@ -228,8 +228,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _placeholderImage() {
     return Container(
-      width: 50,
-      height: 70,
+      width: 60,
+      height: 80,
       color: Colors.grey.shade300,
       child: Icon(Icons.book, color: Colors.grey.shade500),
     );
